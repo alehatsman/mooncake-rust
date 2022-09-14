@@ -1,17 +1,19 @@
 ---
 provision:
-  - variables:
-      test-dire-path: ./test/test-directory-1
+  - name: Make sure vars are included
+    include_vars: ./test/test-directory-1
 
-  - name: Make sure directory is created
+  - name: "Create a directory"
     dir:
-      path: "{{test-dire-path}}"
-    state: exists
+      path: "/tmp/foo"
+      state: "directory"
 
-  - name: Make sure file is created
+  - name: Create a file
     file:
-      path: ./test/test-directory-1/test-file
+      path: /afsdfasdf
+      state: present
 
-  - name: Make sure template is rendered
+  - name: Generate template
     template:
       src: ./template.tera
+      dest: ./file_from_template

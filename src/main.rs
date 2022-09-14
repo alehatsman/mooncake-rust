@@ -1,12 +1,18 @@
 use std::fs;
 
+use serde;
 use serde::Deserialize;
 use serde::Serialize;
+use serde_yaml;
+use std::path::Path;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
-struct Dir {
-    path: String,
-    state: String,
+struct Variables {}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+struct VariablesCommand {
+    name: Option<String>,
+    include_vars: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -16,27 +22,49 @@ struct File {
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
-struct Template {
-    src: String,
+struct DirCommand {
+    name: Option<String>,
+    dir: File,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+struct FileCommand {
+    name: Option<String>,
+    file: File,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+struct TemplateFile {
+    src: Option<String>,
     dest: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
-enum Command {
-    File(File),
-    Template(Template),
-    Dir(Dir),
+struct TemplateCommand {
+    name: Option<String>,
+    template: TemplateFile,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[serde(untagged)]
+enum Command {
+    FileCommand(FileCommand),
+    TemplateCommand(TemplateCommand),
+    DirCommand(DirCommand),
+    VariablesCommand(VariablesCommand),
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
 struct Provision {
     provision: Vec<Command>,
 }
 
 fn ymling() {
     let do_steps = || -> Result<(), Box<dyn std::error::Error>> {
-        let file = fs::read_to_string("./src/provision.yml")?;
-        let provision: Provision = serde_yaml::from_str(&file)?;
+        let path = Path::new("./provision1.yml");
+        let file = fs::read_to_string(path)?;
+        println!("file: {}", file);
+        let provision: Provision = serde_yaml::from_str(&file).unwrap();
         println!("{:#?}", provision);
         Ok(())
     };
