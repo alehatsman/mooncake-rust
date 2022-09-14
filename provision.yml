@@ -1,0 +1,17 @@
+---
+provision:
+  - variables:
+      test-dire-path: ./test/test-directory-1
+
+  - name: Make sure directory is created
+    dir:
+      path: "{{test-dire-path}}"
+    state: exists
+
+  - name: Make sure file is created
+    file:
+      path: ./test/test-directory-1/test-file
+
+  - name: Make sure template is rendered
+    template:
+      src: ./template.tera
